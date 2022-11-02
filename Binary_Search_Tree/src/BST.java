@@ -73,6 +73,90 @@ public class BST {
         return focusNode;
     }
 
+    public boolean remove(int key) {
+        Node focusNode = root;
+        Node parent = root;
+
+        boolean isItALeftChild = true;
+
+        while (focusNode.key != key) {
+            parent = focusNode;
+            if (key < parent.key) {
+                focusNode = focusNode.leftChild;
+                isItALeftChild = true;
+            } else {
+                focusNode = focusNode.rightChild;
+                isItALeftChild = false;
+            }
+            if (focusNode == null) {
+                return false;
+            }
+        }
+
+        if (focusNode.leftChild == null && focusNode.rightChild == null) {
+            if (focusNode == root) {
+                root = null;
+            } else if (isItALeftChild) {
+                parent.leftChild = null;
+            } else {
+                parent.rightChild = null;
+            }
+        }
+
+        else if (focusNode.leftChild != null && focusNode.rightChild == null) {
+            if (focusNode == root) {
+                root = root.leftChild;
+            } else if (isItALeftChild) {
+                parent.leftChild = focusNode.leftChild;
+            } else {
+                parent.rightChild = focusNode.leftChild;
+            }
+        }
+
+        else if (focusNode.leftChild == null && focusNode.rightChild != null) {
+            if (focusNode == root) {
+                root = root.rightChild;
+            } else if (isItALeftChild) {
+                parent.leftChild = focusNode.rightChild;
+            } else {
+                parent.rightChild = focusNode.rightChild;
+            }
+        }
+        // When the node to be removed has two children.
+        else {
+            Node replacement = getReplacementNode(focusNode);
+
+            if (focusNode == root)
+                root = replacement;
+            else if (isItALeftChild)
+                parent.leftChild = replacement;
+            else
+                parent.rightChild = replacement;
+
+            replacement.leftChild = focusNode.leftChild;
+        }
+        return true;
+    }
+
+    public Node getReplacementNode(Node replacedNode) {
+        Node replacementParent = replacedNode;
+        Node replacement = replacedNode;
+
+        Node focusNode = replacedNode.rightChild;
+        while (focusNode != null) {
+            replacementParent = replacement;
+            replacement = focusNode;
+            focusNode = focusNode.leftChild;
+        }
+
+        if (replacement != replacedNode.rightChild) {
+            replacementParent.leftChild = replacement.rightChild;
+            replacement.rightChild = replacedNode.rightChild;
+        }
+
+        return replacement;
+    }
+
     public static void main(String[] args) throws Exception {
         BST the_tree = new BST();
         the_tree.addNode(50, "A");
@@ -82,7 +166,8 @@ public class BST {
         the_tree.addNode(75, "E");
         the_tree.addNode(85, "F");
 
-        System.out.println(the_tree.findNode(30));
+        the_tree.remove(25);
+        the_tree.inOrderTraverseTree(the_tree.root);
     }
 }
 
